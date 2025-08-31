@@ -1,4 +1,4 @@
-import { assets } from "@/Assets/assets"
+import { assets } from "../Assets/assets"
 import Image from "next/image"
 import React from "react"
 const Header =()=>{
@@ -26,7 +26,6 @@ const Header =()=>{
   </form>
 </div>
 
-``
         </div>
     )
 }
