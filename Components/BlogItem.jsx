@@ -1,5 +1,6 @@
 import Image from "next/image"
 import React from "react"
+import {arrow} from "../Assets/arrow.png"
 import {assets} from "../Assets/assets"
 import Link from "next/link"
 const BlogItem =({title, description, category, image, arrow, id})=>{
@@ -12,7 +13,7 @@ const BlogItem =({title, description, category, image, arrow, id})=>{
                  <h5 className="mb-2 text-lg font-medium tracking-tight text-gray-900">{title}</h5>
                  <p className="mb-3 text-sm tracking-tight text-gray-700">{description}</p>
                  <Link href={`/blogs/${id}`} className="inline-flex items-center gap-3 py-2 font-semibold text-center">
-                    Read More <Image src={arrow} className=""/>
+                    Read More <Image src={assets.arrow} alt="arrow icon" width={20} height={20} />
                  </Link>
             </div> 
         </div>
