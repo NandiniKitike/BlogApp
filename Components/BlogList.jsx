@@ -17,7 +17,7 @@ const BlogList = () => {
   }, []);
 
   return (
-    <div className="px-5 md:px-12 lg:px-28 bg-[#fef6e4] py-12">
+    <div className="px-5 md:px-12 lg:px-28 bg-white py-12">
       <div className="flex justify-center gap-3 sm:gap-6 mb-12 flex-wrap">
         {["All", "Technology", "Startup", "Lifestyle"].map((cat) => (
           <button
