@@ -255,7 +255,7 @@ const Page = () => {
             </label>
             <textarea
               name="description"
-              rows={4}
+              rows={3}
               value={data.description}
               onChange={onChangeHandler}
               className="w-full rounded-lg border border-slate-300 p-3 text-sm md:text-base shadow-sm focus:ring focus:ring-amber-400 focus:outline-none"

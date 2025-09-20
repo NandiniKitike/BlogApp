@@ -2,11 +2,11 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const pathname = usePathname();
-
+const router = useRouter();
   const menuItems = [
     { href: "/admin/addProduct", label: "Add Blog", icon: "📝" },
     { href: "/admin/blogList", label: "Blog List", icon: "📋" },
@@ -18,6 +18,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       setSidebarOpen(false);
     }
   };
+
+
+
 
   return (
     <>
@@ -31,15 +34,58 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       >
         {/* Sidebar header */}
         <div className="flex items-center justify-between p-4 border-b border-slate-200 lg:border-none">
-          <h2 className="text-xl font-bold text-slate-800">Dashboard</h2>
-          <button
+          <div className="flex items-center justify-between p-4 border-b border-slate-200 lg:border-none">
+  <div className="flex items-center space-x-2">
+    <button
+      onClick={() => router.back()}
+      className="p-2 rounded-md text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+    >
+     
+      <svg
+        className="w-5 h-5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M15 19l-7-7 7-7"
+        />
+      </svg>
+    </button>
+    <h2 className="text-xl font-bold text-slate-800">Dashboard</h2>
+  </div>
+
+  <button
+    onClick={() => setSidebarOpen(false)}
+    className="lg:hidden p-2 rounded-md text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
+  >
+    <svg
+      className="w-5 h-5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M6 18L18 6M6 6l12 12"
+      />
+    </svg>
+  </button>
+</div>
+         
+          {/* <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-2 rounded-md text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-amber-500"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </button>
+          </button> */}
         </div>
 
         {/* Navigation menu */}
