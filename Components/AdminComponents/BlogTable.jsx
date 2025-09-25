@@ -59,10 +59,7 @@ const BlogTable = ({title, date, deleteBlog, mongoId }) => {
     }
   };
 
-  // const getImageSrc = () => {
-  //   if (!authorImg || !isValidUrl(authorImg)) return assets.profile_icon;
-  //   return authorImg;
-  // };
+ 
 
   return (
     <tr className="bg-white hover:bg-[#fff6ec] transition-colors border-b">
