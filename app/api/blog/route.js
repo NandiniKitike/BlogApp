@@ -5,8 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(request) {
   try {
-    await ConnectDB(); // 👈 Ensure DB connection before querying
-
+    await ConnectDB(); 
     const blogId = request.nextUrl.searchParams.get("id");
     if (blogId) {
       const blog = await BlogModel.findById(blogId);
