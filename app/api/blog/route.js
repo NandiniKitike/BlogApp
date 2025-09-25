@@ -23,37 +23,104 @@ export async function GET(request) {
   }
 }
 
+// export async function POST(request) {
+//   try {
+//     await ConnectDB();
+
+//     const formData = await request.formData();
+//     const timestamp = Date.now();
+//     const image = formData.get("image");
+
+//     let imgUrl = "";
+
+//     if (image && typeof image.arrayBuffer === "function") {
+//       // ✅ SAVE TO UPLOADS FOLDER (NOT PUBLIC)
+//       const uploadsDir = path.join(process.cwd(), 'uploads');
+      
+//       // Create uploads directory if it doesn't exist
+//       if (!fs.existsSync(uploadsDir)) {
+//         await mkdir(uploadsDir, { recursive: true });
+//       }
+
+//       const imageByData = await image.arrayBuffer();
+//       const buffer = Buffer.from(imageByData);
+      
+//       // ✅ FIXED: Save to uploads folder, not public
+//       const filename = `${timestamp}_${image.name.replace(/\s+/g, '_')}`;
+//       const filepath = path.join(uploadsDir, filename);
+//       await writeFile(filepath, buffer);
+      
+//       // ✅ FIXED: Use API route URL instead of direct file path
+//       imgUrl = `/api/uploads/${filename}`;
+//     } else {
+//       imgUrl = formData.get("image") || "";
+//     }
+
+//     const blogData = {
+//       title: formData.get("title") || "",
+//       description: formData.get("description") || "",
+//       category: formData.get("category") || "",
+//       author: formData.get("author") || "",
+//       image: imgUrl, // This will now be /api/uploads/filename.jpg
+//       authorImg: formData.get("authorImg") || "",
+//     };
+
+//     const savedBlog = await BlogModel.create(blogData);
+//     console.log("Blog saved:", savedBlog._id);
+
+//     return NextResponse.json({ 
+//       success: true, 
+//       msg: "Blog added successfully!",
+//       imageUrl: imgUrl
+//     });
+//   } catch (error) {
+//     console.error("POST error:", error);
+//     return NextResponse.json({ success: false, error: error.message });
+//   }
+// }
+// app/api/blog/route.ts
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { ConnectDB } from "../../../lib/config/db"
+import BlogModel from "../../../lib/models/BlogModel"
+import { NextResponse } from "next/server"
+
+const s3 = new S3Client({
+  region: process.env.CLOUDINARY_CLOUD_NAME,
+  credentials: {
+    accessKeyId: process.env.CLOUDINARY_API_KEY,
+    secretAccessKey: process.env.CLOUDINARY_API_SECRET,
+  },
+})
+
 export async function POST(request) {
   try {
-    await ConnectDB();
+    await ConnectDB()
 
-    const formData = await request.formData();
-    const timestamp = Date.now();
-    const image = formData.get("image");
+    const formData = await request.formData()
+    const timestamp = Date.now()
+    const image = formData.get("image")
 
-    let imgUrl = "";
+    let imgUrl = ""
 
     if (image && typeof image.arrayBuffer === "function") {
-      // ✅ SAVE TO UPLOADS FOLDER (NOT PUBLIC)
-      const uploadsDir = path.join(process.cwd(), 'uploads');
+      const imageByData = await image.arrayBuffer()
+      const buffer = Buffer.from(imageByData)
       
-      // Create uploads directory if it doesn't exist
-      if (!fs.existsSync(uploadsDir)) {
-        await mkdir(uploadsDir, { recursive: true });
-      }
-
-      const imageByData = await image.arrayBuffer();
-      const buffer = Buffer.from(imageByData);
+      // ✅ UPLOAD TO S3 (NOT LOCAL FILE SYSTEM)
+      const key = `blog-images/${timestamp}_${image.name.replace(/\s+/g, '_')}`
       
-      // ✅ FIXED: Save to uploads folder, not public
-      const filename = `${timestamp}_${image.name.replace(/\s+/g, '_')}`;
-      const filepath = path.join(uploadsDir, filename);
-      await writeFile(filepath, buffer);
+      await s3.send(new PutObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key,
+        Body: buffer,
+        ContentType: image.type,
+        ACL: 'public-read', // Make images publicly accessible
+      }))
       
-      // ✅ FIXED: Use API route URL instead of direct file path
-      imgUrl = `/api/uploads/${filename}`;
+      // ✅ S3 PUBLIC URL
+      imgUrl = `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
     } else {
-      imgUrl = formData.get("image") || "";
+      imgUrl = formData.get("image") || ""
     }
 
     const blogData = {
@@ -61,23 +128,25 @@ export async function POST(request) {
       description: formData.get("description") || "",
       category: formData.get("category") || "",
       author: formData.get("author") || "",
-      image: imgUrl, // This will now be /api/uploads/filename.jpg
+      image: imgUrl, // S3 URL
       authorImg: formData.get("authorImg") || "",
-    };
+    }
 
-    const savedBlog = await BlogModel.create(blogData);
-    console.log("Blog saved:", savedBlog._id);
+    const savedBlog = await BlogModel.create(blogData)
+    console.log("Blog saved:", savedBlog._id)
 
     return NextResponse.json({ 
       success: true, 
       msg: "Blog added successfully!",
       imageUrl: imgUrl
-    });
+    })
   } catch (error) {
-    console.error("POST error:", error);
-    return NextResponse.json({ success: false, error: error.message });
+    console.error("POST error:", error)
+    return NextResponse.json({ success: false, error: error.message })
   }
 }
+
+// GET and DELETE remain the same...
 
 export async function DELETE(request) {
   try {
